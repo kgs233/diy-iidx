@@ -15,7 +15,6 @@ iivxReport_t report;
  * connect encoders
  * TURNTABLE to pin 0 and 1
  */
-
 int tmp;
 uint8_t buttonCount = 9;
 uint8_t lightMode = 0;
@@ -27,6 +26,7 @@ uint8_t reactiveLightPin = 21;
 uint8_t hidLightPin = 22;
 uint8_t sysInputPins[] = {13,18,19,20};
 int32_t encL=0;
+int32_t beforeencL=0;
 /* current pin layout
  *  pins 18 - 23 = A0 - A5
  *  pins 2 to 10 = LED 1 to 7
@@ -54,6 +54,7 @@ void doEncL(){
 void lights(uint16_t lightDesc){
   for(int i=0;i<buttonCount;i++){
      if((lightDesc>>i)&1){
+        Serial.println(i);
          digitalWrite(ledPins[i],HIGH);
      } else {
          digitalWrite(ledPins[i],LOW);
@@ -84,8 +85,30 @@ void loop() {
       report.buttons &= ~((uint16_t)1 << i);
     }
   }
+
+  if(beforeencL == encL)
+  {
+    encL = 0;
+  }
+  else
+  {
+    beforeencL = encL;
+  }
+
+  if(encL >= 300)
+  {
+    encL = 1;
+  }
+  else if(encL <= -300)
+  {
+    encL = -1;
+  }
+
+  Serial.println(encL);
+
   // Read Encoders
   report.xAxis = (uint8_t)((int32_t)(encL / ENCODER_SENSITIVITY) % 256);
+ 
   // Light LEDs
   if(lightMode==0){
     lights(report.buttons);
