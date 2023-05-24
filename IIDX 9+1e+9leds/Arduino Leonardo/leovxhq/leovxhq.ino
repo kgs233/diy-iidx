@@ -26,7 +26,7 @@ uint8_t reactiveLightPin = 21;
 uint8_t hidLightPin = 22;
 uint8_t sysInputPins[] = {13,18,19,20};
 int32_t encL=0;
-int32_t beforeencL=0;
+int32_t beforeencL=0; //此行基于CC0授权
 /* current pin layout
  *  pins 18 - 23 = A0 - A5
  *  pins 2 to 10 = LED 1 to 7
@@ -86,34 +86,32 @@ void loop() {
     }
   }
 
-  if(encL >= 298)
+//此处起
+  //检测回转
+  if(encL > 0 && encL < beforeencL)
   {
-    if(beforeencL == encL)
-    {
-      encL = 0;
-    }
-    else
-    {
-      encL = 298;
-    }
-  }
-  else if(encL <= -298)
+    encL = 0 - (beforeencL - encL);
+  } else if(encL < 0 && encL > beforeencL)
   {
-    if(beforeencL == encL)
-    {
-      encL = 0;
-    }
-    else
-    {
-      encL = -298;
-    }
+    encL = 0 + (encL - beforeencL);
   }
+  //判断是否停止转碟
   else if(beforeencL == encL)
   {
     encL = 0;
   }
-
+  //检测是否达到碟子极限
+  else if(encL >= 298)
+  {
+    encL = 298;
+  }
+  else if(encL <= -298)
+  {
+    encL = -298;
+  }
+  
   beforeencL = encL;
+//至此处基于CC0授权
 
   // Read Encoders
   report.xAxis = (uint8_t)((int32_t)(encL / ENCODER_SENSITIVITY) % 256);
@@ -124,23 +122,7 @@ void loop() {
   } else {
     lights(iivx_led);
   }
-  // Detect Syspin Entries
-  //if(digitalRead(buttonPins[0])!=HIGH){
-  //  report.buttons = 0;
-  //  for(int i=0;i<4;i++){
-  //    if(digitalRead(sysInputPins[i])!=HIGH){
-  //      report.buttons |= (uint16_t)1 << (i+buttonCount);
-  //    } else {
-   //     report.buttons &= ~((uint16_t)1 << (i+buttonCount));
- //     }
-  //  }
- //   if(digitalRead(reactiveLightPin)!=HIGH){
-  //    lightMode = 0;
- //   } else if (digitalRead(hidLightPin)!=HIGH){
- //     lightMode = 1;
- //   }
- // }
-  // Send report and delay
+  
   iivx.setState(&report);
   delayMicroseconds(REPORT_DELAY);
 }
