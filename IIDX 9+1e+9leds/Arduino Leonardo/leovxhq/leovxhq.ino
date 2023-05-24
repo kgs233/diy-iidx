@@ -86,29 +86,38 @@ void loop() {
     }
   }
 
-  if(beforeencL == encL)
+  if(encL >= 298)
+  {
+    if(beforeencL == encL)
+    {
+      encL = 0;
+    }
+    else
+    {
+      encL = 298;
+    }
+  }
+  else if(encL <= -298)
+  {
+    if(beforeencL == encL)
+    {
+      encL = 0;
+    }
+    else
+    {
+      encL = -298;
+    }
+  }
+  else if(beforeencL == encL)
   {
     encL = 0;
   }
-  else
-  {
-    beforeencL = encL;
-  }
 
-  if(encL >= 300)
-  {
-    encL = 1;
-  }
-  else if(encL <= -300)
-  {
-    encL = -1;
-  }
-
-  Serial.println(encL);
+  beforeencL = encL;
 
   // Read Encoders
   report.xAxis = (uint8_t)((int32_t)(encL / ENCODER_SENSITIVITY) % 256);
- 
+
   // Light LEDs
   if(lightMode==0){
     lights(report.buttons);
