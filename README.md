@@ -1,3 +1,4 @@
+Fork to lizardbeans/diy-iidx, fix the Scratching can't stop, 
 # Beatmania IIDX Controller (DIY)
  
  
